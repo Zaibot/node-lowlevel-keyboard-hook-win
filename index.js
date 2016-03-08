@@ -3,7 +3,7 @@
 let hooks = {};
 
 if (process.platform === 'win32') {
-  const child = require('child_process').execFile('Release/LLKeyboardHook.exe', [], {
+  const child = require('child_process').execFile(__dirname + '/Release/LLKeyboardHook.exe', [], {
       detached: true,
       stdio: [ 'ignore', 1, 2 ],
   });
