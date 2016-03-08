@@ -35,7 +35,7 @@ module.exports = {
   on: (keyCode, fn) => {
     if (KEY_NAMES[keyCode]) {
       let codes = KEY_NAMES[keyCode];
-      codes.forEach(() => module.exports._hook(code, fn));
+      codes.forEach((code) => module.exports._hook(code, fn));
     } else {
       this._hook(keyCode, fn);
     }
