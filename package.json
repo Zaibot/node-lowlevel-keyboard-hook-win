@@ -1,0 +1,11 @@
+{
+  "name": "ll-keyboard-hook-win",
+  "version": "1.0.0",
+  "description": "A low level keyboard hook for windows",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Samuel Attard",
+  "license": "MIT"
+}

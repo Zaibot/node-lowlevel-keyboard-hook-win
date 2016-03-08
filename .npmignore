@@ -1,0 +1,10 @@
+LLKeyboardHook
+LLKeyboardHook.sln
+LLKeyboardHook.sdf
+LLKeyboardHook.opensdf
+Debug/
+Release/*.iobj
+Release/*.ipdb
+Release/*.pdb
+ipch/
+.vs/
