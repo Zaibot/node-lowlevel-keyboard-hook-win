@@ -1,6 +1,6 @@
 {
   "name": "ll-keyboard-hook-win",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A low level keyboard hook for windows",
   "main": "index.js",
   "scripts": {
