@@ -15,6 +15,7 @@ Local<Function> cb;
 HHOOK hhkLowLevelKybd;
 uv_loop_t *loop;
 uv_async_t async;
+std::string str;
 
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -28,8 +29,8 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
             PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lParam;
             std::ostringstream stream;
             stream << p->vkCode;
-            std::string str = stream.str();
-            async.data = (void*) p->vkCode;
+            str = stream.str();
+            async.data = &str;
             uv_async_send(&async);
             break;
         }
@@ -62,17 +63,18 @@ void fake_download(uv_work_t *req) {
 }
 
 void print_progress(uv_async_t *handle) {
-    std::ostringstream stream;
-    stream << handle->data;
-    std::string str = stream.str();
+    std::string &keyCodeString = *(static_cast<std::string*>(handle->data));
+
+    printf("%s", keyCodeString);
+    printf("%s", "\n");
 
     const unsigned argc = 1;
     Isolate* isolate = Isolate::GetCurrent();
     HandleScope scope(isolate);
 
-    Local<Value> argv[argc] = { String::NewFromUtf8(isolate, str.c_str()) };
+    Local<Value> argv[argc] = { String::NewFromUtf8(isolate, "Testing123") };
     // Uncommenting this breaks everything...  With no error...
-    // cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 
 void RunCallback(const FunctionCallbackInfo<Value>& args) {

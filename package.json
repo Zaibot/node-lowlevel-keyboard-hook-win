@@ -8,5 +8,8 @@
   "dependencies": {
     "bindings": "~1.2.1",
     "nan": "^2.2.0"
+  },
+  "scripts": {
+    "start": "npm build . && node ll_keyboard_hooks.js"
   }
 }
