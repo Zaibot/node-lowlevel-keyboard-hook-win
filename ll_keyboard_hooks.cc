@@ -11,7 +11,7 @@
 
 using namespace v8;
 
-Local<Function> cb;
+static Persistent<Function> persistentCallback;
 HHOOK hhkLowLevelKybd;
 uv_loop_t *loop;
 uv_async_t async;
@@ -65,16 +65,14 @@ void fake_download(uv_work_t *req) {
 void print_progress(uv_async_t *handle) {
     std::string &keyCodeString = *(static_cast<std::string*>(handle->data));
 
-    printf("%s", keyCodeString);
-    printf("%s", "\n");
-
     const unsigned argc = 1;
     Isolate* isolate = Isolate::GetCurrent();
     HandleScope scope(isolate);
 
-    Local<Value> argv[argc] = { String::NewFromUtf8(isolate, "Testing123") };
-    // Uncommenting this breaks everything...  With no error...
-    cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
+    Local<Value> argv[argc] = { String::NewFromUtf8(isolate, keyCodeString.c_str()) };
+
+    Local<Function> f = Local<Function>::New(isolate,persistentCallback);
+    f->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 
 void RunCallback(const FunctionCallbackInfo<Value>& args) {
@@ -82,20 +80,19 @@ void RunCallback(const FunctionCallbackInfo<Value>& args) {
 
   HandleScope scope(isolate);
 
-  cb = Local<Function>::Cast(args[0]);
+  Handle<Function> cb = Handle<Function>::Cast(args[0]);
+  persistentCallback.Reset(isolate, cb);
 
   loop = uv_default_loop();
 
   uv_work_t req;
-  int size = 10240;
-  req.data = (void*) &size;
 
-  int tracklen = 10;
-  uv_thread_t hare_id;
+  int param = 0;
+  uv_thread_t t_id;
   uv_thread_cb uvcb = (uv_thread_cb)hook;
   uv_async_init(loop, &async, print_progress);
 
-  uv_thread_create(&hare_id, uvcb, &tracklen);
+  uv_thread_create(&t_id, uvcb, &param);
 }
 
 void Init(Handle<Object> exports, Handle<Object> module) {
