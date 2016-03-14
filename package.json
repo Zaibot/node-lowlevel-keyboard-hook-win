@@ -3,7 +3,6 @@
   "version": "2.0.0",
   "description": "Node.js Addons Example #3",
   "main": "ll_keyboard_hooks.js",
-  "private": true,
   "gypfile": true,
   "dependencies": {
     "bindings": "~1.2.1",
