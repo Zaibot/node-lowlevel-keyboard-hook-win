@@ -1,5 +1,5 @@
 {
-  "name": "callbacks",
+  "name": "ll-keyboard-hook-win",
   "version": "2.0.0",
   "description": "Node.js Addons Example #3",
   "main": "ll_keyboard_hooks.js",
