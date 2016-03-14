@@ -1,10 +1,7 @@
-#include <node.h>
 #include <nan.h>
 #include <sstream>
 #include <string>
 #include <iostream>
-#include <thread>
-#include <random>
 #include <stdlib.h>
 #include <Windows.h>
 #define _WIN32_WINNT 0x050
