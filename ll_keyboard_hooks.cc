@@ -47,19 +47,7 @@ void hook() {
    UnhookWindowsHookEx(hhkLowLevelKybd);
 }
 
-void fake_download(uv_work_t *req) {
-  hhkLowLevelKybd = SetWindowsHookEx(WH_KEYBOARD_LL, LowLevelKeyboardProc, 0, 0);
-
-  MSG msg;
-  while (!GetMessage(&msg, NULL, NULL, NULL)) {
-    TranslateMessage(&msg);
-    DispatchMessage(&msg);
-  }
-
-  UnhookWindowsHookEx(hhkLowLevelKybd);
-}
-
-void print_progress(uv_async_t *handle) {
+void handleKeyEvent(uv_async_t *handle) {
     std::string &keyCodeString = *(static_cast<std::string*>(handle->data));
 
     const unsigned argc = 1;
@@ -87,7 +75,7 @@ void RunCallback(const FunctionCallbackInfo<Value>& args) {
   int param = 0;
   uv_thread_t t_id;
   uv_thread_cb uvcb = (uv_thread_cb)hook;
-  uv_async_init(loop, &async, print_progress);
+  uv_async_init(loop, &async, handleKeyEvent);
 
   uv_thread_create(&t_id, uvcb, &param);
 }
