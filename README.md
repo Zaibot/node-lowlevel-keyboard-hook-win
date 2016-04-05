@@ -9,8 +9,15 @@ We use this module to get better media key bindings on windows in [GPMDP](https:
 
 Requiring the module returns an object with two methods
 
-### on(keyCode, fn)
-This will call `fn()` every time the key with key code `keyCode` is pressed.
+### on(keyEvent, keyCode, fn)
+This will call `fn()` every time the key with key code `keyCode` performed whatever action `keyEvent` is.
+
+#### Possible Values for keyEvent
+| `"up"` | `"down"` | `"*"` |
+|--------|----------|-------|
+| Fires whenever that key is released | Fires whenever that key is pressed down, this event fires multiple times for held keys | Fires for any key event (up or down) |
+
+**NOTE:** `keyCode` has to be a [vkCode](http://www.kbdedit.com/manual/low_level_vk_list.html) or `"*"`
 
 ### unbind()
 This removes all keybindings

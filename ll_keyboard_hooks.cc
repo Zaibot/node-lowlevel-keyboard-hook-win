@@ -20,13 +20,19 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 
     if (nCode == HC_ACTION)
     {
+        std::ostringstream stream;
+        PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lParam;
         switch (wParam)
         {
         case WM_KEYDOWN:
-            PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)lParam;
-            std::ostringstream stream;
             stream << p->vkCode;
-            str = stream.str();
+            str = "down::" + stream.str();
+            async.data = &str;
+            uv_async_send(&async);
+            break;
+        case WM_KEYUP:
+            stream << p->vkCode;
+            str = "up::" + stream.str();
             async.data = &str;
             uv_async_send(&async);
             break;

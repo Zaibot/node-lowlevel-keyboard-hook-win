@@ -7,9 +7,22 @@ const hookKeyboard = require('bindings')('ll_keyboard_hooks');
 let hooks = {};
 
 hookKeyboard((data) => {
-  const keyCode = data.toString().trim().replace(/\n/g, '');
-  if (hooks[keyCode]) {
-    hooks[keyCode].forEach((fn) => fn());
+  const keyCodePattern = data.toString().trim().replace(/\n/g, '');
+  const keyCodeEvent = keyCodePattern.split('::')[0];
+  const keyCode = keyCodePattern.split('::')[1];
+  const eventObj = {
+    event: keyCodeEvent,
+    vkCode: keyCode,
+  };
+
+  if (hooks[keyCodeEvent] && hooks[keyCodeEvent][keyCode]) {
+    hooks[keyCodeEvent][keyCode].forEach((fn) => fn(eventObj));
+  }
+  if (hooks[keyCodeEvent] && hooks[keyCodeEvent]['*']) {
+    hooks[keyCodeEvent]['*'].forEach((fn) => fn(eventObj));
+  }
+  if (hooks['*'] && hooks['*']['*']) {
+    hooks['*']['*'].forEach((fn) => fn(eventObj));
   }
 });
 
@@ -26,18 +39,19 @@ for (let F = 1; F <= 24; F++) {
   KEY_NAMES[`F${F}`] = 112 + F - 1;
 }
 
-const _hook = (code, fn) => {
-  hooks[code] = hooks[code] || [];
-  hooks[code].push(fn);
+const _hook = (keyCodeEvent, code, fn) => {
+  hooks[keyCodeEvent] = hooks[keyCodeEvent] || {};
+  hooks[keyCodeEvent][code] = hooks[keyCodeEvent][code] || [];
+  hooks[keyCodeEvent][code].push(fn);
 }
 
 module.exports = {
-  on: (keyCode, fn) => {
+  on: (keyCodeEvent, keyCode, fn) => {
     if (KEY_NAMES[keyCode]) {
       let codes = KEY_NAMES[keyCode];
-      codes.forEach((code) => _hook(code, fn));
+      codes.forEach((code) => _hook(keyCodeEvent, code, fn));
     } else {
-      _hook(keyCode, fn);
+      _hook(keyCodeEvent, keyCode, fn);
     }
   },
   unbind: () => {
