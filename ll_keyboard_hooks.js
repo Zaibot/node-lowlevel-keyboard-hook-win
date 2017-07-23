@@ -4,58 +4,26 @@ if (process.platform !== 'win32') return;
 
 const hookKeyboard = require('bindings')('ll_keyboard_hooks');
 
-let hooks = {};
-
-hookKeyboard((data) => {
-  const keyCodePattern = data.toString().trim().replace(/\n/g, '');
-  const keyCodeEvent = keyCodePattern.split('::')[0];
-  const keyCode = keyCodePattern.split('::')[1];
-  const eventObj = {
-    event: keyCodeEvent,
-    vkCode: keyCode,
-  };
-
-  if (hooks[keyCodeEvent] && hooks[keyCodeEvent][keyCode]) {
-    hooks[keyCodeEvent][keyCode].forEach((fn) => fn(eventObj));
-  }
-  if (hooks[keyCodeEvent] && hooks[keyCodeEvent]['*']) {
-    hooks[keyCodeEvent]['*'].forEach((fn) => fn(eventObj));
-  }
-  if (hooks['*'] && hooks['*']['*']) {
-    hooks['*']['*'].forEach((fn) => fn(eventObj));
-  }
-});
-
-const KEY_NAMES = {
-  'Control': [162, 163],
-  'Shift': [160, 161],
-  'MediaPlayPause': [179],
-  'MediaStop': [178],
-  'MediaPreviousTrack': [177],
-  'MediaNextTrack': [176]
-};
-
-for (let F = 1; F <= 24; F++) {
-  KEY_NAMES[`F${F}`] = 112 + F - 1;
-}
-
-const _hook = (keyCodeEvent, code, fn) => {
-  hooks[keyCodeEvent] = hooks[keyCodeEvent] || {};
-  hooks[keyCodeEvent][code] = hooks[keyCodeEvent][code] || [];
-  hooks[keyCodeEvent][code].push(fn);
+const getMode = (modes) => {
+  return modes.split(',').reduce((state, cur) => {
+    if (cur === 'up') {
+      return state | 0x01;
+    } else if (cur === 'down') {
+      return state | 0x02;
+    } else {
+      throw Error(`expects 'up' and/or 'down' splitted by a comma`);
+    }
+  }, 0)
 }
 
 module.exports = {
-  on: (keyCodeEvent, keyCode, fn) => {
-    if (KEY_NAMES[keyCode]) {
-      let codes = KEY_NAMES[keyCode];
-      codes.forEach((code) => _hook(keyCodeEvent, code, fn));
-    } else {
-      _hook(keyCodeEvent, keyCode, fn);
-    }
+  on: (modes, fn) => {
+    hookKeyboard.run(getMode(modes), (eventData) => {
+      const parts = eventData.split('::');
+      fn(parts[0], parts[1]);
+    });
   },
-  unbind: () => {
-    hooks = {};
-    return true;
+  stop: () => {
+    hookKeyboard.stop();
   }
 };
