@@ -13,5 +13,6 @@
   ],
   "scripts": {
     "start": "npm build . && node ll_keyboard_hooks.js"
-  }
+  },
+  "typings": "typings.d.ts"
 }
