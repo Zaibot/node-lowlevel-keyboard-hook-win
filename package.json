@@ -1,6 +1,6 @@
 {
   "name": "@zaibot/ll-keyboard-hook-win",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "Listen to global keyboard events on Windows",
   "main": "ll_keyboard_hooks.js",
   "gypfile": true,
